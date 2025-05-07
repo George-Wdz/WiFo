@@ -14,7 +14,7 @@ The dataset used for inference is available in [[Testing Dataset]](https://huggi
 
 
 ## Get Started
-We have released the pre-trained weights of WiFo-Base for inference in [[Model](https://huggingface.co/liuboxun/WiFo)].
+We have released the pre-trained weights of WiFo-Large/Base/Small/Little/Tiny for inference in [[Model](https://huggingface.co/liuboxun/WiFo)].
 
 ### Inference command for multi-dataset unified learning
 ```
