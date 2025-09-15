@@ -41,7 +41,7 @@ def data_load_single(args, dataset): # 加载单个数据集
 
 
     batch_size = args.batch_size
-    test_data = th.utils.data.DataLoader(test_data, num_workers=32, batch_size =  batch_size, shuffle=False, pin_memory=True, prefetch_factor=4)
+    test_data = th.utils.data.DataLoader(test_data, num_workers=4, batch_size =  batch_size, shuffle=False, pin_memory=True, prefetch_factor=4)
 
     return  test_data
 
