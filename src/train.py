@@ -7,6 +7,7 @@ from sklearn.metrics import mean_squared_error,mean_absolute_error
 import math
 import time
 import collections
+import os
 
 
 class TrainLoop:
@@ -33,27 +34,52 @@ class TrainLoop:
     def Sample(self, test_data, step, mask_ratio, mask_strategy, seed=None, dataset='', index=0):
         with torch.no_grad():
             error_nmse = 0
-            num=0
-            # start time
+            num = 0
+
+            predictions = []
+            targets = []
+
+            patch_info = None  # 初始化 patch_info
+
             for _, batch in enumerate(test_data[index]):
 
-                loss, _, pred, target, mask = self.model_forward(batch, self.model, mask_ratio, mask_strategy, seed=seed, data = dataset, mode='forward')
+                loss, _, pred, target, mask = self.model_forward(batch, self.model, mask_ratio, mask_strategy, seed=seed, data=dataset, mode='forward')
 
+                if patch_info is None:
+                    patch_info = self.model.patch_info  # 获取 patch_info
 
                 dim1 = pred.shape[0]
                 pred_mask = pred.squeeze(dim=2)  # [N,240,32]
                 target_mask = target.squeeze(dim=2)
 
 
-                y_pred = pred_mask[mask==1].reshape(-1,1).reshape(dim1,-1).detach().cpu().numpy()  # [Batch_size, 样本点数目]
-                y_target = target_mask[mask==1].reshape(-1,1).reshape(dim1,-1).detach().cpu().numpy()
+                y_pred = pred_mask[mask == 1].reshape(-1, 1).reshape(dim1, -1).detach().cpu().numpy()  # [Batch_size, 样本点数目]
+                y_target = target_mask[mask == 1].reshape(-1, 1).reshape(dim1, -1).detach().cpu().numpy()
+
+                predictions.append(y_pred)
+                targets.append(y_target)
 
                 error_nmse += np.sum(np.mean(np.abs(y_target - y_pred) ** 2, axis=1) / np.mean(np.abs(y_target) ** 2, axis=1))
                 num += y_pred.shape[0]  # 本轮mask的个数: 1000*576*0.5
 
-        nmse = error_nmse / num
+            # 保存预测值和目标值
+            predictions = np.concatenate(predictions, axis=0)
+            targets = np.concatenate(targets, axis=0)
 
-        return nmse
+            output_dir = self.args.model_path
+            os.makedirs(output_dir, exist_ok=True)
+
+            pred_file = os.path.join(output_dir, f"y_pred_{dataset}_{mask_strategy}_{mask_ratio}.npz")
+            target_file = os.path.join(output_dir, f"y_target_{dataset}_{mask_strategy}_{mask_ratio}.npz")
+            meta_file = os.path.join(output_dir, f"meta_{dataset}_{mask_strategy}_{mask_ratio}.npz")
+
+            np.savez(pred_file, y_pred=predictions)
+            np.savez(target_file, y_target=targets)
+            np.savez(meta_file, patch_info=patch_info)  # 保存 patch_info
+
+           
+
+            return error_nmse / num
 
 
     def Evaluation(self, test_data, epoch, seed=None):
