@@ -29,10 +29,10 @@ class MyDataset(Dataset):
 
 def data_load_single(args, dataset): # 加载单个数据集
 
-    folder_path_test = '../dataset/{}/X_test.mat'.format(dataset)
+    folder_path_test = '../dataset/{}/X_test.mat'.format(dataset)#路径
 
-    X_test = hdf5storage.loadmat(folder_path_test)
-    X_test_complex = torch.tensor(np.array(X_test['X_val'], dtype=complex)).unsqueeze(1)
+    X_test = hdf5storage.loadmat(folder_path_test)#读.mat文件，取出x_val
+    X_test_complex = torch.tensor(np.array(X_test['X_val'], dtype=complex)).unsqueeze(1)#转复数张量
 
     ## 实部+虚部
     X_test = torch.cat((X_test_complex.real, X_test_complex.imag),dim=1).float()
@@ -49,7 +49,7 @@ def data_load(args):
 
     test_data_all = []
 
-    for dataset_name in args.dataset.split('*'):
+    for dataset_name in args.dataset.split('*'):#支持多个数据集名字拼接，用“*”分隔
         test_data = data_load_single(args, dataset_name)
         test_data_all.append(test_data)
     
