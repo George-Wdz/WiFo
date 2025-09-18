@@ -2,73 +2,101 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 
-pred = np.load("y_pred_D17_temporal_0.5.npz")
-targ = np.load("y_target_D17_temporal_0.5.npz")
-meta = np.load("meta_D17_temporal_0.5.npz")
+pred = np.load("y_pred_D9_temporal_0.5.npz")
+targ = np.load("y_target_D9_temporal_0.5.npz")
+meta = np.load("meta_D9_temporal_0.5.npz")
+
+pred_o = np.load("y_pred_decoded_D9_temporal_0.5.npz")
+targ_o = np.load("y_target_decoded_D9_temporal_0.5.npz")
 
 print("Pred keys:", pred.files)
 print("Targ keys:", targ.files)
 print("Meta keys:", meta.files)
+print("Pred_o keys:", pred_o.files)
+print("Targ_o keys:", targ_o.files)
 
 pred_arr = pred[pred.files[0]]
 targ_arr = targ[targ.files[0]]
 meta_arr = meta[meta.files[0]]
+pred_o_arr = pred_o[pred_o.files[0]]
+targ_o_arr = targ_o[targ_o.files[0]]
 
-data = np.load("predictions_step_0_batch_0.npz")
-y_pred = data['y_pred']
-y_target = data['y_target']
-patch_info = data['patch_info']
+y_pred = pred_arr[:, :]
+y_target = targ_arr[:, :]
+patch_info = meta_arr[:]
+y_pred_o = pred_o_arr[:, :]
+y_target_o = targ_o_arr[:, :]
 
-print("y_pred shape:", y_pred.shape)
-print("y_target shape:", y_target.shape)
-print("patch_info:", patch_info)
 
 print("Pred shape:", pred_arr.shape, "range:", pred_arr.min(), pred_arr.max())
 print("Targ shape:", targ_arr.shape, "range:", targ_arr.min(), targ_arr.max())
+print("Meta shape:", meta_arr.shape, "range:", meta_arr.min(), meta_arr.max())
+print("Pred_o shape:", pred_o_arr.shape, "range:", pred_o_arr.min(), pred_o_arr.max())
+print("Targ_o shape:", targ_o_arr.shape, "range:", targ_o_arr.min(), targ_o_arr.max())
 
-sample_idx = 0
-ant_idx = 0   # 选一根天线
-pred_sample = pred_arr[sample_idx, :, ant_idx, :]
-targ_sample = targ_arr[sample_idx, :, ant_idx, :]
+import torch
 
-plt.subplot(1,2,1)
-plt.imshow(np.abs(pred_sample), aspect="auto")
-plt.title("Prediction |ant0|")
+def get_compute_device():
+    """Detect and return the best available compute device"""
+    if torch.cuda.is_available():
+        device = torch.device('cuda')
+        print(f"Using GPU: {torch.cuda.get_device_name(0)}")
+    else:
+        device = torch.device('cpu')
+        print("Using CPU (no GPU available)")
+    return device
 
-plt.subplot(1,2,2)
-plt.imshow(np.abs(targ_sample), aspect="auto")
-plt.title("Target |ant0|")
+def normalized_mean_squared_error(y_true, y_pred, device=None):
+    """
+    Calculate NMSE for complex CSI data using Frobenius norm:
+    NMSE = ||H_pred - H_true||_F^2 / ||H_true||_F^2
+    
+    Args:
+        y_true: numpy array or torch tensor of true CSI (can be complex)
+        y_pred: numpy array or torch tensor of predicted CSI
+        device: torch device (cpu/cuda), auto-detected if None
+        
+    Returns:
+        nmse: Normalized Mean Squared Error
+    """
+    # Convert inputs to PyTorch tensors if needed
+    if not isinstance(y_true, torch.Tensor):
+        y_true = torch.from_numpy(np.asarray(y_true))
+    if not isinstance(y_pred, torch.Tensor):
+        y_pred = torch.from_numpy(np.asarray(y_pred))
+    
+    # Auto-detect device if not specified
+    if device is None:
+        device = get_compute_device()
+    
+    # Move tensors to device and ensure complex dtype if needed
+    y_true = y_true.to(device)
+    y_pred = y_pred.to(device)
+    
+    # Validate shapes
+    if y_true.shape != y_pred.shape:
+        raise ValueError(f"Shape mismatch: y_true {y_true.shape}, y_pred {y_pred.shape}")
+    
+    # Calculate Frobenius norms
+    diff = y_true - y_pred
+    numerator = torch.linalg.norm(diff, ord='fro') ** 2
+    denominator = torch.linalg.norm(y_true, ord='fro') ** 2
+    
+    # Handle zero denominator case
+    if denominator == 0:
+        print("Warning: Denominator is zero - returning numerator")
+        return numerator.item()
+    
+    return (numerator / denominator).item()
 
-plt.show()
+# Calculate and display NMSE results
+nmse = normalized_mean_squared_error(y_target, y_pred)
 
-error = np.abs(pred_sample - targ_sample)
+print("\n=== Enhanced NMSE Analysis ===")
+print(f"Data points: {len(y_target.flatten())}")
+print(f"Target range: [{y_target.min():.4f}, {y_target.max():.4f}]")
+print(f"Prediction range: [{y_pred.min():.4f}, {y_pred.max():.4f}]")
+print(f"MSE: {np.mean((y_target - y_pred)**2):.6f}")
+print(f"Target variance: {np.var(y_target):.6f}")
+print(f"NMSE: {nmse:.6f}")
 
-plt.imshow(error, aspect="auto")
-plt.title("Prediction Error (|Pred-Target|)")
-plt.colorbar()
-plt.show()
-
-subcarrier_idx = 10
-plt.plot(np.abs(pred_sample[:, subcarrier_idx]), label="Pred")
-plt.plot(np.abs(targ_sample[:, subcarrier_idx]), label="Target")
-plt.legend()
-plt.title("Amplitude vs Time (subcarrier 10, ant 0)")
-plt.show()
-
-# 打印文件夹中所有文件的信息
-def print_file_info(directory):
-    for root, dirs, files in os.walk(directory):
-        for file in files:
-            file_path = os.path.join(root, file)
-            try:
-                data = np.load(file_path)
-                print(f"File: {file}")
-                print("Keys:", data.files)
-                for key in data.files:
-                    print(f"{key} shape:", data[key].shape)
-                print("-")
-            except Exception as e:
-                print(f"Could not read {file}: {e}")
-
-# 调用函数打印当前目录下所有文件的信息
-print_file_info(".")
