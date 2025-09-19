@@ -1,0 +1,30 @@
+# 忽略所有扩展名为 .pkl 的模型权重文件
+*.pkl
+
+# 忽略名为 "weights" 的文件夹及其所有内容
+weights/
+
+# 忽略名为 "data", "dataset", "datasets" 的文件夹及其所有内容
+data/
+dataset/
+datasets/
+logs/
+
+# 忽略所有以 .npy, .npz, .csv 结尾的数据文件 (根据您的实际情况调整)
+*.npy
+*.npz
+*.csv
+
+# 忽略日志文件
+*.log
+
+# 忽略Python虚拟环境文件夹 (您的 wifo_env)
+wifo_env/
+
+# 忽略系统或IDE产生的文件
+.DS_Store
+.vscode/
+__pycache__/
+*.pyc
+.git/
+.github/
