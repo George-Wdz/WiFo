@@ -2,12 +2,12 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 
-pred = np.load("y_pred_D9_temporal_0.5.npz")
-targ = np.load("y_target_D9_temporal_0.5.npz")
-meta = np.load("meta_D9_temporal_0.5.npz")
+pred = np.load("y_pred_D1_temporal_0.5.npz")
+targ = np.load("y_target_D1_temporal_0.5.npz")
+meta = np.load("meta_D1_temporal_0.5.npz")
 
-pred_o = np.load("y_pred_decoded_D9_temporal_0.5.npz")
-targ_o = np.load("y_target_decoded_D9_temporal_0.5.npz")
+pred_o = np.load("y_pred_decoded_D1_temporal_0.5.npz")
+targ_o = np.load("y_target_decoded_D1_temporal_0.5.npz")
 
 print("Pred keys:", pred.files)
 print("Targ keys:", targ.files)
