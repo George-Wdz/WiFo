@@ -7,10 +7,7 @@ from sklearn.metrics import mean_squared_error,mean_absolute_error
 import math
 import time
 import collections
-<<<<<<< HEAD
-=======
 import os
->>>>>>> code-fix
 
 
 class TrainLoop:
@@ -35,16 +32,6 @@ class TrainLoop:
 
 
     def Sample(self, test_data, step, mask_ratio, mask_strategy, seed=None, dataset='', index=0):
-<<<<<<< HEAD
-        with torch.no_grad():
-            error_nmse = 0
-            num=0
-            # start time
-            for _, batch in enumerate(test_data[index]):
-
-                loss, _, pred, target, mask = self.model_forward(batch, self.model, mask_ratio, mask_strategy, seed=seed, data = dataset, mode='forward')
-
-=======
         """
         Run the model on `test_data` and compute NMSE on masked patches.
 
@@ -87,17 +74,12 @@ class TrainLoop:
 
                 if patch_info is None:
                     patch_info = self.model.patch_info  # 获取 patch_info
->>>>>>> code-fix
 
                 dim1 = pred.shape[0]
                 pred_mask = pred.squeeze(dim=2)  # [N,240,32]
                 target_mask = target.squeeze(dim=2)
 
 
-<<<<<<< HEAD
-                y_pred = pred_mask[mask==1].reshape(-1,1).reshape(dim1,-1).detach().cpu().numpy()  # [Batch_size, 样本点数目]
-                y_target = target_mask[mask==1].reshape(-1,1).reshape(dim1,-1).detach().cpu().numpy()
-=======
                 y_pred = pred_mask[mask == 1].reshape(-1, 1).reshape(dim1, -1).detach().cpu().numpy()  # [Batch_size, 样本点数目]
                 y_target = target_mask[mask == 1].reshape(-1, 1).reshape(dim1, -1).detach().cpu().numpy()
 
@@ -122,16 +104,10 @@ class TrainLoop:
                     decoded_predictions.append(pred_decoded)
                 if target_decoded is not None:
                     decoded_targets.append(target_decoded)
->>>>>>> code-fix
 
                 error_nmse += np.sum(np.mean(np.abs(y_target - y_pred) ** 2, axis=1) / np.mean(np.abs(y_target) ** 2, axis=1))
                 num += y_pred.shape[0]  # 本轮mask的个数: 1000*576*0.5
 
-<<<<<<< HEAD
-        nmse = error_nmse / num
-
-        return nmse
-=======
             # 保存预测值和目标值
             predictions = np.concatenate(predictions, axis=0)
             targets = np.concatenate(targets, axis=0)
@@ -166,7 +142,6 @@ class TrainLoop:
            
 
             return error_nmse / num
->>>>>>> code-fix
 
 
     def Evaluation(self, test_data, epoch, seed=None):
