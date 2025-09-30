@@ -90,6 +90,26 @@ def WiFo_model(args, **kwargs):
             **kwargs,
         )
         return model
+<<<<<<< HEAD
+=======
+    elif args.size == 'large':
+        model = WiFo(
+            embed_dim=768,
+            depth=8,
+            decoder_depth=4,
+            num_heads=8,
+            decoder_num_heads = 8,
+            mlp_ratio=4,
+            t_patch_size=args.t_patch_size,
+            patch_size=args.patch_size,
+            norm_layer=partial(nn.LayerNorm, eps=1e-6),
+            pos_emb = args.pos_emb,
+            no_qkv_bias = bool(args.no_qkv_bias),
+            args = args,
+            **kwargs,
+        )
+        return model
+>>>>>>> code-fix
 
 
 class Attention(nn.Module):

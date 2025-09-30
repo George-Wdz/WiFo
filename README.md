@@ -18,6 +18,7 @@ We have released the pre-trained weights of WiFo-Large/Base/Small/Little/Tiny fo
 
 ### Inference command for multi-dataset unified learning
 ```
+<<<<<<< HEAD
 python main.py --device_id 1 --size base --mask_strategy_random none --mask_strategy temporal --dataset D1*D2*D3*D4*D5*D6*D7*D8*D9*D10*D11*D12*D13*D14*D15*D16 --file_load_path ./weights/wifo_base --few_ratio 0.0 --t_patch_size 4 --patch_size 4 --batch_size 128 --pos_emb SinCos_3D
 ```
 ```
@@ -26,6 +27,16 @@ python main.py --device_id 1 --size base --mask_strategy_random none --mask_stra
 ### Inference command for zero-shot generalization
 ```
 python main.py --device_id 1 --size base --mask_strategy_random none --mask_strategy temporal --dataset D17 --file_load_path ./weights/wifo_base --few_ratio 0.0 --t_patch_size 4 --patch_size 4 --batch_size 128 --pos_emb SinCos_3D
+=======
+python src\main.py --device_id 1 --size base --mask_strategy_random none --mask_strategy temporal --dataset D1*D2*D3*D4*D5*D6*D7*D8*D9*D10*D11*D12*D13*D14*D15*D16 --file_load_path ./weights/wifo_base --few_ratio 0.0 --t_patch_size 4 --patch_size 4 --batch_size 128 --pos_emb SinCos_3D
+```
+```
+python src\main.py --device_id 1 --size base --mask_strategy_random none --mask_strategy fre --dataset D1*D2*D3*D4*D5*D6*D7*D8*D9*D10*D11*D12*D13*D14*D15*D16 --file_load_path ./weights/wifo_base --few_ratio 0.0 --t_patch_size 4 --patch_size 4 --batch_size 128 --pos_emb SinCos_3D
+```
+### Inference command for zero-shot generalization
+```
+python src\main.py --device_id 1 --size base --mask_strategy_random none --mask_strategy temporal --dataset D17 --file_load_path ./weights/wifo_base --few_ratio 0.0 --t_patch_size 4 --patch_size 4 --batch_size 128 --pos_emb SinCos_3D
+>>>>>>> code-fix
 ```
 ## Citation
 If you find this repo helpful, please cite our paper.
