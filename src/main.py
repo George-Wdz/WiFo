@@ -1,9 +1,5 @@
 # coding=utf-8
 import argparse
-<<<<<<< HEAD
-=======
-import re
->>>>>>> code-fix
 import random
 import os
 from model import WiFo_model
@@ -94,10 +90,6 @@ def main():
 
     test_data = data_load_main(args) # 加载数据
 
-<<<<<<< HEAD
-    args.folder = 'Dataset_{}_Task_{}_FewRatio_{}_{}_{}/'.format(args.dataset, args.task, args.few_ratio, args.size, args.note)
-
-=======
     # sanitize strings used in file/folder names to avoid invalid characters on Windows
     def sanitize_for_filename(s: object) -> str:
         s = str(s)
@@ -114,7 +106,6 @@ def main():
     safe_note = sanitize_for_filename(args.note)
 
     args.folder = 'Dataset_{}_Task_{}_FewRatio_{}_{}_{}/'.format(safe_dataset, args.task, args.few_ratio, args.size, safe_note)
->>>>>>> code-fix
 
     args.folder = 'Test_'+args.folder
 

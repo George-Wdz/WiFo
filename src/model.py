@@ -90,12 +90,12 @@ def WiFo_model(args, **kwargs):
             **kwargs,
         )
         return model
-<<<<<<< HEAD
-=======
+
     elif args.size == 'large':
         model = WiFo(
             embed_dim=768,
             depth=8,
+            decoder_embed_dim = 768,
             decoder_depth=4,
             num_heads=8,
             decoder_num_heads = 8,
@@ -109,7 +109,6 @@ def WiFo_model(args, **kwargs):
             **kwargs,
         )
         return model
->>>>>>> code-fix
 
 
 class Attention(nn.Module):
